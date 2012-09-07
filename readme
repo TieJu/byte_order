@@ -1,0 +1,72 @@
+/**
+ * Author: Tiemo Jung
+ * contact: tiemo dot jung at mni dot fh-giessen dot de
+ * licencse: zlib Licencse
+ * Copyright (c) 2012 Tiemo Jung
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ *  1. The origin of this software must not be misrepresented; you must not
+ *  claim that you wrote the original software. If you use this software
+ *  in a product, an acknowledgment in the product documentation would be
+ *  appreciated but is not required.
+ *
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *  misrepresented as being the original software.
+ *
+ *  3. This notice may not be removed or altered from any source
+ *  distribution.
+ */
+ 
+A smal wrapper for base types to automaticly handle endianness conversations.
+
+Defautl configuration is little endian, to enable big endian mode just define
+BIG_ENDIAN before include the header file.
+
+You can just replace any base type of a header def with the predefined endian 
+maped type. 
+
+Instead of writing:
+
+struct header {
+	// big endian
+	int int_value;
+	// little endian
+	short short_value;
+	// big endian
+	char char_value;
+	// little endian
+	float float_value;
+};
+
+void load_header(void *data,heade *&header) {
+	header = reinterpret_cast<header *>(data);
+	header.int_value 	= to_big_endian(header.int_value);
+	header.short_value 	= to_little_endian(header.short_value);
+	header.char_value 	= to_big_endian(header.char_value);
+	header.float_value 	= to_little_endian(header.float_value);
+}
+
+you can replace the type with the target endinan type:
+
+using namespace byte_order;
+struct header {
+	big_int 		int_value;
+	little_short	short_value;
+	big_char		char_value; // makes little sence i know...
+	litte_float		float_value;
+};
+
+void load_header(void *data,heade *&header) {
+	header = reinterpret_cast<header *>(data);
+	// no convert step needed, types of the headers members convert the data on read / write if needed
+}
+
+This moves the definition of the byte layout of the source data from 'load_header' to the definition
+of 'header' and makes the code much cleaner and safer.
